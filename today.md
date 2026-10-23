@@ -34,13 +34,16 @@ button type="button" id="previewButton", p id="summary".
    { id: "scrubber", name: "Exhaust scrubber", price: 180000, onlyFuel: "diesel" },
    { id: "monitoring", name: "Remote monitoring", price: 40000 }
    ];
+
    Build: your own (35 min): write enginePrice(fuelId, count) using find, and allowedAddons(fuelId) using filter (keep add-ons with no onlyFuel or a matching one). Test both in the console.
    Check
    • Fuel dropdown shows 3 fuels, built by JS
    • Cargo, LNG, 3 → "Cargo · LNG · 3 engine(s)"
    • enginePrice("diesel", 2) → 800000; allowedAddons("lng") has no scrubber
    • fuels.find(f => f.id === "hydrogen") → undefined
+
    Explain: find vs filter? Why are prices in data.js, not in the HTML?
+
    Interview questions (answer out loud)
    Question
    Short answer
