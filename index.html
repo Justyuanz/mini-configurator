@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="data.js" defer></script>
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <h1>Ship power configurator</h1>
+    <form action="submit" id="form">
+      <label for="vessel"> Vessel: </label>
+      <select id="vessel">
+        <option value="">--please choose a vessel--</option>
+        <option value="Ferry">Ferry</option>
+        <option value="Cargo">Cargo</option>
+        <option value="Cruise">Cruise</option>
+      </select>
+      <br />
+      <label for="fuel">Fuel: </label>
+      <select id="fuel">
+        <option value="">--please choose a fuel--</option>
+      </select>
+      <br />
+      <label for="engines">Engines: </label>
+      <input type="number" id="engines" value="1" />
+      <br />
+      <button type="button" id="previewButton">Preview</button>
+      <p id="summary">Summary</p>
+    </form>
+  </body>
+</html>
