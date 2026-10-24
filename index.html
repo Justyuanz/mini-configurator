@@ -8,26 +8,28 @@
     <script src="app.js" defer></script>
   </head>
   <body>
-    <h1>Ship power configurator</h1>
-    <form action="submit" id="form">
-      <label for="vessel"> Vessel: </label>
-      <select id="vessel">
-        <option value="">--please choose a vessel--</option>
-        <option value="Ferry">Ferry</option>
-        <option value="Cargo">Cargo</option>
-        <option value="Cruise">Cruise</option>
-      </select>
-      <br />
-      <label for="fuel">Fuel: </label>
-      <select id="fuel">
-        <option value="">--please choose a fuel--</option>
-      </select>
-      <br />
-      <label for="engines">Engines: </label>
-      <input type="number" id="engines" value="1" />
-      <br />
-      <button type="button" id="previewButton">Preview</button>
-      <p id="summary">Summary</p>
-    </form>
+    <main>
+      <h1>Mini engine configurator</h1>
+      <p>
+        Pick a vessel, fuel, engines and add-ons. The price updates on every
+        change.
+      </p>
+
+      <form id="form">
+        <fieldset id="vesselOptions">
+          <legend>1 · Vessel</legend>
+        </fieldset>
+
+        <fieldset id="fuelOptions">
+          <legend>2 · Fuel</legend>
+        </fieldset>
+
+        <label for="engines">Engines: </label>
+        <input type="number" id="engines" value="1" min="1" max="4" />
+
+        <button type="button" id="previewButton">Preview</button>
+        <p id="summary"></p>
+      </form>
+    </main>
   </body>
 </html>
