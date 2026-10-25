@@ -1,27 +1,48 @@
-const vesselSelect = document.querySelector("#vessel");
-const fuelSelect = document.querySelector("#fuel");
+const fuelBox = document.querySelector("#fuelOptions");
+const form = document.querySelector("#form");
 const engineInput = document.querySelector("#engines");
 const previewButton = document.querySelector("#previewButton");
 const summaryPara = document.querySelector("#summary");
 
-//fuels from data.js
+//fill fuels cards from data.js
 for (const fuel of fuels) {
-  const fuelOption = document.createElement("option");
-  fuelOption.textContent = fuel.name;
-  console.log(fuel.name);
-  fuelSelect.append(fuelOption);
+  const label = document.createElement("label");
+  label.className = "opt";
+
+  const input = document.createElement("input");
+  input.type = "radio";
+  input.name = "fuel";
+  input.value = fuel.id;
+  if (fuel.id === "diesel") {
+    input.checked = true;
+  }
+
+  const labelText = `${fuel.name} · €${fuel.pricePerEngine.toLocaleString("en-US")} / engine`;
+  label.append(input);
+  label.append(labelText);
+  fuelBox.append(label);
 }
 
 // On Preview click, show `${vessel} · ${fuel} · ${engines} engine(s)`.
 
 previewButton.addEventListener("click", (e) => {
   e.preventDefault();
-  summaryPara.textContent = `${vesselSelect.value} · ${fuelSelect.value} · ${engineInput.value} engine(s)`;
+
+  const vesselId = form.elements.vessel.value;
+  const fuelId = form.elements.fuel.value;
+  const vessel = findVessel(vesselId);
+  const fuel = findFuel(fuelId);
+
+  summaryPara.textContent = `${vessel.name} · ${fuel.name} · ${engineInput.value} engine(s)`;
 });
 
-//write enginePrice(fuelId, count) using find. enginePrice("diesel", 2) → 800000
-//and allowedAddons(fuelId) using filter (keep add-ons with no onlyFuel or a matching one).
-//allowedAddons("lng") has no scrubber
+function findVessel(vesselId) {
+  const normalizedVesselId = vesselId.trim().toLowerCase();
+
+  return vessels.find(
+    (vessel) => vessel.id.toLowerCase() === normalizedVesselId,
+  );
+}
 
 function findFuel(fuelId) {
   const normalizedFuelId = fuelId.trim().toLowerCase();
@@ -36,7 +57,6 @@ function findFuel(fuelId) {
 }
 
 function enginePrice(fuelId, count) {
-  //need to add guard here
   if (typeof count !== "number" || count < 0) {
     return "Invalid count";
   }

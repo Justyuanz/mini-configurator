@@ -1,35 +1,43 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-    <script src="data.js" defer></script>
-    <script src="app.js" defer></script>
-  </head>
-  <body>
-    <main>
-      <h1>Mini engine configurator</h1>
-      <p>
-        Pick a vessel, fuel, engines and add-ons. The price updates on every
-        change.
-      </p>
 
-      <form id="form">
-        <fieldset id="vesselOptions">
-          <legend>1 · Vessel</legend>
-        </fieldset>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+  <script src="data.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
 
-        <fieldset id="fuelOptions">
-          <legend>2 · Fuel</legend>
-        </fieldset>
+<body>
+  <main>
+    <h1>Mini engine configurator</h1>
+    <p>
+      Pick a vessel, fuel, engines and add-ons. The price updates on every
+      change.
+    </p>
 
-        <label for="engines">Engines: </label>
-        <input type="number" id="engines" value="1" min="1" max="4" />
+    <form id="form">
+      <fieldset id="vesselOptions">
+        <legend>1 · Vessel</legend>
+        <label class="opt"><input type="radio" name="vessel" value="ferry" />Ferry · 1–4
+          engines</label>
+        <label class="opt"><input type="radio" name="vessel" value="cargo" checked />Cargo</label>
+        <label class="opt"><input type="radio" name="vessel" value="cruise" />Cruise(Needs 2+ engines)</label>
+      </fieldset>
 
-        <button type="button" id="previewButton">Preview</button>
-        <p id="summary"></p>
-      </form>
-    </main>
-  </body>
+      <fieldset id="fuelOptions">
+        <legend>2 · Fuel</legend>
+        <!--Filled by app.js-->
+      </fieldset>
+
+      <label for="engines">Engines: </label>
+      <input type="number" id="engines" value="1" min="1" max="4" />
+      <br />
+      <button type="button" id="previewButton">Preview</button>
+      <p id="summary"></p>
+    </form>
+  </main>
+</body>
+
 </html>
