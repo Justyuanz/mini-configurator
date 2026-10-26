@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Document</title>
+  <title>Mini product configurator</title>
   <script src="data.js" defer></script>
   <script src="app.js" defer></script>
 </head>
@@ -31,10 +31,17 @@
         <!--Filled by app.js-->
       </fieldset>
 
-      <label for="engines">Engines: </label>
-      <input type="number" id="engines" value="1" min="1" max="4" />
-      <br />
-      <button type="button" id="previewButton">Preview</button>
+      <fieldset id="engineNumbers">
+        <legend>3 · Engine</legend>
+        <label for="engines">Engines: </label>
+        <input type="number" id="engines" value="1" min="1" max="4" />
+      </fieldset>
+
+      <fieldset id="addonOptions">
+        <legend>4 · Addon optional</legend>
+        <!--Filled by app.js-->
+      </fieldset>
+      <button type="submit" id="previewButton">Request quote</button>
       <p id="summary"></p>
     </form>
   </main>
