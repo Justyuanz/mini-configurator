@@ -1,9 +1,12 @@
 //DOM reference
-const fuelBox = document.querySelector("#fuelOptions");
-const addonBox = document.querySelector("#addonOptions");
 const form = document.querySelector("#form");
+const fuelBox = document.querySelector("#fuelOptions");
 const engineInput = document.querySelector("#engines");
+const engineError = document.querySelector("#enginesError");
+const addonBox = document.querySelector("#addonOptions");
+const addonError = document.querySelector("#addonsError");
 const summaryPara = document.querySelector("#summary");
+const pricePara = document.querySelector("#price");
 
 init();
 
@@ -22,7 +25,7 @@ function renderFuelOptions() {
     input.type = "radio";
     input.name = "fuel";
     input.value = fuel.id;
-    if (fuel.id === "diesel") {
+    if (fuel.default) {
       input.checked = true;
     }
 
@@ -42,8 +45,8 @@ function renderAddonOptions() {
     const input = document.createElement("input");
     input.type = "checkbox";
     input.name = "addon";
-    input.value = `${addon.id}`;
-    if (addon.id === "monitoring") {
+    input.value = addon.id;
+    if (addon.default) {
       input.checked = true;
     }
 
@@ -54,45 +57,105 @@ function renderAddonOptions() {
   }
 }
 
+// Eventlistener
 form.addEventListener("submit", (e) => {
   e.preventDefault();
 
+  engineError.textContent = "";
+  summaryPara.textContent = "";
+  pricePara.textContent = "";
+  addonError.textContent = "";
+
+  let hasError = false;
   const vesselId = form.elements.vessel.value;
   const fuelId = form.elements.fuel.value;
   const addonInputLists = form.querySelectorAll('input[name="addon"]');
 
   const vessel = findById(vessels, vesselId);
   const fuel = findById(fuels, fuelId);
-  const addonNames = [];
+  const selectedAddons = [];
 
   for (const el of addonInputLists) {
     if (el.checked) {
       const addon = findById(addons, el.value);
-      addonNames.push(addon.name);
+      selectedAddons.push(addon);
     }
   }
 
-  summaryPara.textContent = `${vessel.name} · ${fuel.name} · ${engineInput.value} engine(s) · ${addonNames.join(", ")}`;
+  const raw = engineInput.value.trim();
+  const engineCheck = validateEngines(raw, vessel);
+  if (!engineCheck.ok) {
+    engineError.textContent = engineCheck.message;
+    hasError = true;
+  }
+
+  const addonCheck = validateAddons(selectedAddons, fuelId);
+  if (!addonCheck.ok) {
+    addonError.textContent = addonCheck.message;
+    hasError = true;
+  }
+
+  if (hasError) return;
+
+  const totalPrice = calculatePrice(
+    engineCheck.count,
+    fuel.pricePerEngine,
+    selectedAddons,
+  );
+
+  summaryPara.textContent = `Summary: ${vessel.name} · ${fuel.name} · ${engineCheck.count} engine(s) · ${selectedAddons.map((addon) => addon.name).join(", ")}`;
+  pricePara.textContent = `Total: €${totalPrice.toLocaleString("en-US")}`;
 });
 
+// Validation rulesets
+function validateEngines(raw, vessel) {
+  if (raw === "") {
+    return { ok: false, message: "Enter the number" };
+  }
+
+  const count = Number(raw);
+
+  if (Number.isNaN(count)) {
+    return { ok: false, message: "Engine count must be a number" };
+  }
+  if (!Number.isInteger(count)) {
+    return { ok: false, message: "Engine count must be an integer" };
+  }
+  if (count < 1 || count > 4) {
+    return { ok: false, message: "Engines must be 1–4." };
+  }
+  if (count < vessel.minEngines) {
+    return {
+      ok: false,
+      message: `${vessel.name} needs ${vessel.minEngines} or more engines`,
+    };
+  }
+  return { ok: true, count };
+}
+
+function validateAddons(selectedAddons, fuelId) {
+  for (const addon of selectedAddons) {
+    if (addon.onlyFuel && addon.onlyFuel !== fuelId) {
+      return {
+        ok: false,
+        message: `${addon.name} needs ${addon.onlyFuel.toUpperCase()}, not ${fuelId.toUpperCase()}`,
+      };
+    }
+  }
+  return { ok: true };
+}
+
+// Helpers
 function findById(list, id) {
   return list.find((item) => item.id === id);
 }
 
-function enginePrice(fuelId, count) {
-  if (typeof count !== "number" || count < 0) {
-    return "Invalid count";
-  }
-  const fuelFound = findById(fuels, fuelId);
-  if (!fuelFound) return "Fuel not found";
-  return fuelFound.pricePerEngine * count;
-}
+function calculatePrice(engineCount, fuelPrice, selectedAddons) {
+  let addonCost = 0;
 
-function allowedAddons(fuelId) {
-  const fuelFound = findById(fuels, fuelId);
-  if (!fuelFound) return "Fuel not found";
-  // returns arrays of addons worksWithEveryFuel or add work with only diesel
-  return addons.filter((addon) => {
-    return !addon.onlyFuel || addon.onlyFuel === fuelId;
-  });
+  for (const addon of selectedAddons) {
+    addonCost += addon.price;
+  }
+
+  return engineCount * fuelPrice + addonCost;
 }

@@ -17,7 +17,7 @@
       change.
     </p>
 
-    <form id="form">
+    <form id="form" novalidate>
       <fieldset id="vesselOptions">
         <legend>1 · Vessel</legend>
         <label class="opt"><input type="radio" name="vessel" value="ferry" />Ferry · 1–4
@@ -34,15 +34,18 @@
       <fieldset id="engineNumbers">
         <legend>3 · Engine</legend>
         <label for="engines">Engines: </label>
-        <input type="number" id="engines" value="1" min="1" max="4" />
+        <input type="number" id="engines" name="engines" value="1" min="1" max="4" />
+        <p id="enginesError"></p>
       </fieldset>
 
       <fieldset id="addonOptions">
         <legend>4 · Addon optional</legend>
         <!--Filled by app.js-->
+        <p id="addonsError"></p>
       </fieldset>
       <button type="submit" id="previewButton">Request quote</button>
-      <p id="summary"></p>
+      <p id="summary" role="status"></p>
+      <p id="price"></p>
     </form>
   </main>
 </body>
