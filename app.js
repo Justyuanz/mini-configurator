@@ -13,6 +13,7 @@ init();
 function init() {
   renderFuelOptions();
   renderAddonOptions();
+  renderQuote();
 }
 
 // Fill fuels cards from data.js
@@ -60,35 +61,33 @@ function renderAddonOptions() {
 // Eventlistener
 form.addEventListener("submit", (e) => {
   e.preventDefault();
+  renderQuote();
+});
 
+form.addEventListener("change", (e) => {
+  e.preventDefault();
+  renderQuote();
+});
+
+// Render on every change
+function renderQuote() {
   engineError.textContent = "";
   summaryPara.textContent = "";
   pricePara.textContent = "";
   addonError.textContent = "";
 
   let hasError = false;
-  const vesselId = form.elements.vessel.value;
-  const fuelId = form.elements.fuel.value;
-  const addonInputLists = form.querySelectorAll('input[name="addon"]');
 
-  const vessel = findById(vessels, vesselId);
-  const fuel = findById(fuels, fuelId);
-  const selectedAddons = [];
+  syncAddonCheckbox(form.elements.fuel.value); //automatically gives the checked one
+  const { vessel, fuel, enginesRaw, selectedAddons } = readState();
 
-  for (const el of addonInputLists) {
-    if (el.checked) {
-      const addon = findById(addons, el.value);
-      selectedAddons.push(addon);
-    }
-  }
-
-  const raw = engineInput.value.trim();
-  const engineCheck = validateEngines(raw, vessel);
+  const engineCheck = validateEngines(enginesRaw, vessel);
   if (!engineCheck.ok) {
     engineError.textContent = engineCheck.message;
     hasError = true;
   }
 
+  const fuelId = form.elements.fuel.value;
   const addonCheck = validateAddons(selectedAddons, fuelId);
   if (!addonCheck.ok) {
     addonError.textContent = addonCheck.message;
@@ -105,7 +104,28 @@ form.addEventListener("submit", (e) => {
 
   summaryPara.textContent = `Summary: ${vessel.name} · ${fuel.name} · ${engineCheck.count} engine(s) · ${selectedAddons.map((addon) => addon.name).join(", ")}`;
   pricePara.textContent = `Total: €${totalPrice.toLocaleString("en-US")}`;
-});
+}
+
+// Read state
+function readState() {
+  const vesselId = form.elements.vessel.value;
+  const fuelId = form.elements.fuel.value;
+  const addonInputLists = form.querySelectorAll('input[name="addon"]');
+
+  const vessel = findById(vessels, vesselId);
+  const fuel = findById(fuels, fuelId);
+  const enginesRaw = engineInput.value.trim();
+  const selectedAddons = [];
+
+  for (const el of addonInputLists) {
+    if (el.checked) {
+      const addon = findById(addons, el.value);
+      selectedAddons.push(addon);
+    }
+  }
+
+  return { vessel, fuel, enginesRaw, selectedAddons };
+}
 
 // Validation rulesets
 function validateEngines(raw, vessel) {
@@ -138,7 +158,7 @@ function validateAddons(selectedAddons, fuelId) {
     if (addon.onlyFuel && addon.onlyFuel !== fuelId) {
       return {
         ok: false,
-        message: `${addon.name} needs ${addon.onlyFuel.toUpperCase()}, not ${fuelId.toUpperCase()}`,
+        message: `${addon.name} needs ${findById(fuels, addon.onlyFuel).name}, not ${findById(fuels, fuelId).name}`,
       };
     }
   }
@@ -148,6 +168,24 @@ function validateAddons(selectedAddons, fuelId) {
 // Helpers
 function findById(list, id) {
   return list.find((item) => item.id === id);
+}
+
+function syncAddonCheckbox(fuelId) {
+  const addonCheckboxes = form.querySelectorAll('input[name="addon"]');
+
+  addonCheckboxes.forEach((el) => {
+    let allowed = false;
+    const addon = findById(addons, el.value);
+    if (!addon.onlyFuel || addon.onlyFuel === fuelId) {
+      allowed = true;
+    }
+    if (!allowed) {
+      el.disabled = true;
+      el.checked = false;
+    } else {
+      el.disabled = false;
+    }
+  });
 }
 
 function calculatePrice(engineCount, fuelPrice, selectedAddons) {
