@@ -4,7 +4,6 @@ const fuelBox = document.querySelector("#fuelOptions");
 const engineInput = document.querySelector("#engines");
 const engineError = document.querySelector("#enginesError");
 const addonBox = document.querySelector("#addonOptions");
-const addonError = document.querySelector("#addonsError");
 const summaryPara = document.querySelector("#summary");
 const pricePara = document.querySelector("#price");
 
@@ -74,7 +73,6 @@ function renderQuote() {
   engineError.textContent = "";
   summaryPara.textContent = "";
   pricePara.textContent = "";
-  addonError.textContent = "";
 
   let hasError = false;
 
@@ -90,7 +88,6 @@ function renderQuote() {
   const fuelId = form.elements.fuel.value;
   const addonCheck = validateAddons(selectedAddons, fuelId);
   if (!addonCheck.ok) {
-    addonError.textContent = addonCheck.message;
     hasError = true;
   }
 
@@ -158,7 +155,6 @@ function validateAddons(selectedAddons, fuelId) {
     if (addon.onlyFuel && addon.onlyFuel !== fuelId) {
       return {
         ok: false,
-        message: `${addon.name} needs ${findById(fuels, addon.onlyFuel).name}, not ${findById(fuels, fuelId).name}`,
       };
     }
   }
