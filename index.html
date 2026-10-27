@@ -36,6 +36,9 @@
         <label for="engines">Engines: </label>
         <input type="number" id="engines" name="engines" value="1" min="1" max="4" />
         <p id="enginesError"></p>
+
+        <label for="cylinders">Cylinders: </label>
+        <select name="cylinders" id="cylinders"></select>
       </fieldset>
 
       <fieldset id="addonOptions">
@@ -43,7 +46,7 @@
         <!--Filled by app.js-->
       </fieldset>
       <button type="submit" id="previewButton">Request quote</button>
-      <p id="summary" role="status"></p>
+      <ul id="summary" role="status"></ul>
       <p id="price"></p>
     </form>
   </main>

@@ -3,19 +3,21 @@ const form = document.querySelector("#form");
 const fuelBox = document.querySelector("#fuelOptions");
 const engineInput = document.querySelector("#engines");
 const engineError = document.querySelector("#enginesError");
+const cylinderSelect = document.querySelector("#cylinders");
 const addonBox = document.querySelector("#addonOptions");
-const summaryPara = document.querySelector("#summary");
+const summaryList = document.querySelector("#summary");
 const pricePara = document.querySelector("#price");
 
 init();
 
 function init() {
   renderFuelOptions();
+  renderCylinderOptions();
   renderAddonOptions();
   renderQuote();
 }
 
-// Fill fuels cards from data.js
+// Fill cards from data.js
 function renderFuelOptions() {
   for (const fuel of fuels) {
     const label = document.createElement("label");
@@ -36,7 +38,16 @@ function renderFuelOptions() {
   }
 }
 
-// Fill addon cards from data.js
+function renderCylinderOptions() {
+  for (const cyl of cylinderOptions) {
+    const option = document.createElement("option");
+    option.value = cyl.id;
+    option.textContent = cyl.name;
+
+    cylinderSelect.append(option);
+  }
+}
+
 function renderAddonOptions() {
   for (const addon of addons) {
     const label = document.createElement("label");
@@ -71,15 +82,15 @@ form.addEventListener("change", (e) => {
 // Render on every change
 function renderQuote() {
   engineError.textContent = "";
-  summaryPara.textContent = "";
   pricePara.textContent = "";
 
   let hasError = false;
 
   syncAddonCheckbox(form.elements.fuel.value); //automatically gives the checked one
-  const { vessel, fuel, enginesRaw, selectedAddons } = readState();
+  const { vessel, fuel, enginesRaw, cylinders, selectedAddons } = readState();
 
   const engineCheck = validateEngines(enginesRaw, vessel);
+  engineInput.min = vessel.minEngines;
   if (!engineCheck.ok) {
     engineError.textContent = engineCheck.message;
     hasError = true;
@@ -96,22 +107,57 @@ function renderQuote() {
   const totalPrice = calculatePrice(
     engineCheck.count,
     fuel.pricePerEngine,
+    cylinders.priceExtra,
     selectedAddons,
   );
 
-  summaryPara.textContent = `Summary: ${vessel.name} · ${fuel.name} · ${engineCheck.count} engine(s) · ${selectedAddons.map((addon) => addon.name).join(", ")}`;
+  const output = calculateOutput(
+    engineCheck.count,
+    cylinders.count,
+    fuel.kwPerCylinder,
+  );
+  renderSummary(vessel, fuel, engineCheck, cylinders, output, selectedAddons);
   pricePara.textContent = `Total: €${totalPrice.toLocaleString("en-US")}`;
+}
+
+function renderSummary(
+  vessel,
+  fuel,
+  engineCheck,
+  cylinders,
+  output,
+  selectedAddons,
+) {
+  const summaryLines = [];
+  summaryLines.push(vessel.name);
+  summaryLines.push(
+    `${fuel.name}(${fuel.tier}) x ${engineCheck.count} engine(s) x ${cylinders.count} cylinders `,
+  );
+  summaryLines.push(`Output ${output.toLocaleString("en-US")} kw`);
+  selectedAddons.forEach((addon) => {
+    summaryLines.push(addon.name);
+  });
+
+  summaryList.replaceChildren();
+
+  for (const line of summaryLines) {
+    const li = document.createElement("li");
+    li.textContent = line;
+    summaryList.append(li);
+  }
 }
 
 // Read state
 function readState() {
   const vesselId = form.elements.vessel.value;
   const fuelId = form.elements.fuel.value;
+  const cylinderId = form.elements.cylinders.value;
   const addonInputLists = form.querySelectorAll('input[name="addon"]');
 
   const vessel = findById(vessels, vesselId);
   const fuel = findById(fuels, fuelId);
   const enginesRaw = engineInput.value.trim();
+  const cylinders = findById(cylinderOptions, cylinderId);
   const selectedAddons = [];
 
   for (const el of addonInputLists) {
@@ -121,7 +167,7 @@ function readState() {
     }
   }
 
-  return { vessel, fuel, enginesRaw, selectedAddons };
+  return { vessel, fuel, enginesRaw, cylinders, selectedAddons };
 }
 
 // Validation rulesets
@@ -184,12 +230,21 @@ function syncAddonCheckbox(fuelId) {
   });
 }
 
-function calculatePrice(engineCount, fuelPrice, selectedAddons) {
+function calculateOutput(engineCount, cylinderCount, kwPerCylinder) {
+  return engineCount * cylinderCount * kwPerCylinder;
+}
+
+function calculatePrice(
+  engineCount,
+  fuelPrice,
+  cylindersPrice,
+  selectedAddons,
+) {
   let addonCost = 0;
 
   for (const addon of selectedAddons) {
     addonCost += addon.price;
   }
 
-  return engineCount * fuelPrice + addonCost;
+  return engineCount * (fuelPrice + cylindersPrice) + addonCost;
 }
