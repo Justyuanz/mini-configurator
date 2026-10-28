@@ -137,21 +137,33 @@ function renderSummary({
   output,
   selectedAddons,
 }) {
-  const summaryLines = [];
-  summaryLines.push(vessel.name);
-  summaryLines.push(
-    `${fuel.name}(${fuel.tier}) x ${engineCheck.count} engine(s) x ${cylinders.count} cylinders `,
-  );
-  summaryLines.push(`Output ${output.toLocaleString("en-US")} kW`);
-  selectedAddons.forEach((addon) => {
-    summaryLines.push(addon.name);
-  });
+  const summaryLines = [
+    { label: "Vessel", value: vessel.name },
+    { label: "Fuel", value: fuel.name },
+    {
+      label: "Engines",
+      value: `${engineCheck.count} × ${cylinders.count} cyl`,
+    },
+    { label: "Output", value: `${output.toLocaleString("en-US")} kW` },
+    { label: "Emission", value: fuel.tier },
+  ];
+
+  for (const addon of selectedAddons) {
+    summaryLines.push({ label: "Add-on", value: addon.name });
+  }
 
   summaryList.replaceChildren();
 
   for (const line of summaryLines) {
     const li = document.createElement("li");
-    li.textContent = line;
+
+    const label = document.createElement("span");
+    label.textContent = line.label;
+
+    const value = document.createElement("span");
+    value.textContent = line.value;
+
+    li.append(label, value);
     summaryList.append(li);
   }
 }

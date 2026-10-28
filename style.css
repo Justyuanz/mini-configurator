@@ -38,6 +38,7 @@
 
 body {
   font-family: "IBM Plex Sans", sans-serif;
+  background: var(--ground);
 }
 
 main {
@@ -54,12 +55,43 @@ legend {
 
 fieldset {
   display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  border: none;
+  background: var(--surface);
+  border-radius: var(--radius-fieldset);
+  padding: var(--space-6);
+  margin-bottom: var(--space-4);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+fieldset:last-of-type {
+  margin-bottom: 0;
+}
+
+input[type="number"],
+select {
+  font: inherit;
+  padding: var(--space-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-input);
+  background: var(--surface);
+}
+
+input[type="number"] {
+  width: 7rem;
+  text-align: center;
 }
 
 button {
+  width: 100%;
+  padding: var(--space-3);
+  border: none;
+  border-radius: var(--radius-input);
   color: var(--surface);
   background: var(--accent);
-  font-weight: bold;
+  font-size: 1rem;
+  font-weight: 600;
 }
 
 button:hover {
@@ -82,7 +114,7 @@ button:hover {
 }
 
 .options {
-  flex: 3;
+  flex: 5;
 }
 
 .opt {
@@ -92,6 +124,7 @@ button:hover {
   border-radius: var(--radius-card);
   background: var(--surface);
   cursor: pointer;
+  flex: 1;
 }
 
 .opt:hover {
@@ -111,6 +144,15 @@ button:hover {
 }
 
 .summary {
+  flex: 2;
+  background: var(--surface);
+  border-radius: var(--radius-fieldset);
+  padding: var(--space-6);
+  margin-top: 0.7rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.engineField {
   flex: 1;
 }
 
@@ -123,6 +165,36 @@ button:hover {
 .error {
   color: var(--error);
   font-size: small;
+}
+
+#summary {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#summary li {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--line);
+}
+
+#summary li span:first-child {
+  color: var(--muted);
+}
+
+#price {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 1.25rem;
+  font-weight: 400;
+  align-self: flex-end;
+  margin: var(--space-4) 0;
+}
+
+#engineNumbers {
+  justify-content: space-between;
+  align-items: flex-start;
 }
 
 @media (max-width: 600px) {
