@@ -1,0 +1,132 @@
+:root {
+  /* colour */
+  --ink: #0e1a2b;
+  --muted: #4a5868;
+  --line: #d5dce4;
+  --ground: #f3f5f8;
+  --surface: #ffffff;
+  --header: #12324f;
+  --select: #1d5fa8;
+  --select-soft: #eef4fb;
+  --accent: #c2410c;
+  --error: #842318;
+  --notice: #fff4e5;
+  --notice-ink: #7a3e00;
+
+  /* spacing — 4px base */
+  --space-1: 4px; /* tiny */
+  --space-2: 8px; /* label gap */
+  --space-3: 12px; /* card gap */
+  --space-4: 16px; /* between steps */
+  --space-6: 24px; /* panel padding */
+  --space-8: 32px; /* page top */
+
+  /* radius */
+  --radius-input: 6px;
+  --radius-card: 10px;
+  --radius-fieldset: 12px;
+}
+
+:focus-visible {
+  outline: 3px solid var(--select);
+  outline-offset: 2px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "IBM Plex Sans", sans-serif;
+}
+
+main {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+legend {
+  font-weight: 600;
+  font-size: 1.125rem;
+  color: var(--ink);
+}
+
+fieldset {
+  display: flex;
+}
+
+button {
+  color: var(--surface);
+  background: var(--accent);
+  font-weight: bold;
+}
+
+button:hover {
+  background: #a8360a;
+}
+
+.site-header {
+  padding: var(--space-3) var(--space-6);
+  background: var(--header);
+  color: var(--surface);
+}
+
+.layout {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.intro {
+  color: var(--muted);
+}
+
+.options {
+  flex: 3;
+}
+
+.opt {
+  display: block;
+  padding: var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  cursor: pointer;
+}
+
+.opt:hover {
+  border-color: var(--select);
+}
+
+.opt:has(input:checked) {
+  border-color: var(--select);
+  background: var(--select-soft);
+}
+
+.opt:has(input:disabled) {
+  color: var(--muted);
+  background: var(--ground);
+  border-color: var(--line);
+  cursor: not-allowed;
+}
+
+.summary {
+  flex: 1;
+}
+
+.hint {
+  font-weight: 400;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+.error {
+  color: var(--error);
+  font-size: small;
+}
+
+@media (max-width: 600px) {
+  .layout {
+    flex-direction: column;
+  }
+}

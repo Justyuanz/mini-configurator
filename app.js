@@ -43,6 +43,9 @@ function renderCylinderOptions() {
     const option = document.createElement("option");
     option.value = cyl.id;
     option.textContent = cyl.name;
+    if (cyl.default) {
+      option.selected = true;
+    }
 
     cylinderSelect.append(option);
   }
@@ -75,7 +78,6 @@ form.addEventListener("submit", (e) => {
 });
 
 form.addEventListener("change", (e) => {
-  e.preventDefault();
   renderQuote();
 });
 
@@ -116,24 +118,31 @@ function renderQuote() {
     cylinders.count,
     fuel.kwPerCylinder,
   );
-  renderSummary(vessel, fuel, engineCheck, cylinders, output, selectedAddons);
+  renderSummary({
+    vessel,
+    fuel,
+    engineCheck,
+    cylinders,
+    output,
+    selectedAddons,
+  });
   pricePara.textContent = `Total: €${totalPrice.toLocaleString("en-US")}`;
 }
 
-function renderSummary(
+function renderSummary({
   vessel,
   fuel,
   engineCheck,
   cylinders,
   output,
   selectedAddons,
-) {
+}) {
   const summaryLines = [];
   summaryLines.push(vessel.name);
   summaryLines.push(
     `${fuel.name}(${fuel.tier}) x ${engineCheck.count} engine(s) x ${cylinders.count} cylinders `,
   );
-  summaryLines.push(`Output ${output.toLocaleString("en-US")} kw`);
+  summaryLines.push(`Output ${output.toLocaleString("en-US")} kW`);
   selectedAddons.forEach((addon) => {
     summaryLines.push(addon.name);
   });
