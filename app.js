@@ -228,6 +228,18 @@ function validateAddons(selectedAddons, fuelId) {
   return { ok: true };
 }
 
+function saveToUrl(vessel, fuel, enginesRaw, cylinders, selectedAddons) {
+  const params = new URLSearchParams();
+
+  params.set("vessel", vessel.id);
+  params.set("fuel", fuel.id);
+  params.set("engines", enginesRaw);
+  params.set("cylinders", cylinders.id);
+  params.set("addons", selectedAddons.map((addon) => addon.id).join(","));
+
+  history.replaceState(null, "", "?" + params);
+}
+
 // Helpers
 function findById(list, id) {
   return list.find((item) => item.id === id);
