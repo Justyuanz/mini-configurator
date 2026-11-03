@@ -14,7 +14,8 @@ function init() {
   renderFuelOptions();
   renderCylinderOptions();
   renderAddonOptions();
-  renderQuote();
+  loadFromUrl();
+  renderCost();
 }
 
 // Fill cards from data.js
@@ -74,15 +75,15 @@ function renderAddonOptions() {
 // Eventlistener
 form.addEventListener("submit", (e) => {
   e.preventDefault();
-  renderQuote();
+  renderCost();
 });
 
 form.addEventListener("change", (e) => {
-  renderQuote();
+  renderCost();
 });
 
 // Render on every change
-function renderQuote() {
+function renderCost() {
   engineError.textContent = "";
   pricePara.textContent = "";
 
@@ -104,6 +105,7 @@ function renderQuote() {
     hasError = true;
   }
 
+  saveToUrl(vessel, fuel, enginesRaw, cylinders, selectedAddons);
   if (hasError) return;
 
   const totalPrice = calculatePrice(
@@ -235,9 +237,43 @@ function saveToUrl(vessel, fuel, enginesRaw, cylinders, selectedAddons) {
   params.set("fuel", fuel.id);
   params.set("engines", enginesRaw);
   params.set("cylinders", cylinders.id);
-  params.set("addons", selectedAddons.map((addon) => addon.id).join(","));
+  for (const addon of selectedAddons) {
+    params.append("addon", addon.id);
+  }
 
   history.replaceState(null, "", "?" + params);
+}
+
+function loadFromUrl() {
+  const paramsFromUrl = new URLSearchParams(location.search);
+  const vesselID = paramsFromUrl.get("vessel");
+  const fuelID = paramsFromUrl.get("fuel");
+  const engineID = paramsFromUrl.get("engines");
+  const cylinderID = paramsFromUrl.get("cylinders");
+
+  if (findById(vessels, vesselID)) {
+    form.elements.vessel.value = vesselID;
+  }
+  if (findById(fuels, fuelID)) {
+    form.elements.fuel.value = fuelID;
+  }
+  if (engineID) {
+    form.elements.engines.value = engineID;
+  }
+  if (findById(cylinderOptions, cylinderID)) {
+    form.elements.cylinders.value = cylinderID;
+  }
+
+  const addonIds = paramsFromUrl.getAll("addon");
+  const addonInputs = form.querySelectorAll('input[name="addon"]');
+
+  for (const el of addonInputs) {
+    if (addonIds.includes(el.value)) {
+      el.checked = true;
+    } else {
+      el.checked = false;
+    }
+  }
 }
 
 // Helpers
