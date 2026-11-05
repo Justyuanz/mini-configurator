@@ -40,3 +40,22 @@ static bool ScrubberAllowed(string fuel)
 Console.WriteLine(ScrubberAllowed("LNG"));      // False
 Console.WriteLine(ScrubberAllowed("Diesel"));   // True
 
+Console.WriteLine(new Fuel("lng", "hi", 40000m));
+
+List<Fuel> fuels = new()
+{
+    new Fuel("diesel", "Diesel", 400000m),
+    new Fuel("lng", "LNG", 520000m),
+    new Fuel("methanol", "Methanol", 560000m),
+};
+
+List<Addon> addons = new()
+{
+    new Addon("hybrid", "Battery hybrid", 250000m, null),
+    new Addon("scrubber", "Exhaust scrubber", 180000m, "diesel"),
+    new Addon("monitoring", "Remote monitoring", 40000m, null),
+};
+
+
+record Fuel(string Id, string Name, decimal Price);
+record Addon(string Id, string Name, decimal Price, string? OnlyFuel);
