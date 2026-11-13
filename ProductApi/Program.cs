@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Identity;
 using MySqlConnector;
 
 var builder = WebApplication.CreateBuilder(args);

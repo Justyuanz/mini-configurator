@@ -8,7 +8,21 @@ const addonBox = document.querySelector("#addonOptions");
 const summaryList = document.querySelector("#summary");
 const pricePara = document.querySelector("#price");
 
-init();
+let fuels = [];
+
+start();
+
+async function loadFuels() {
+  const res = await fetch("/api/fuels");
+  const data = await res.json();
+  return data;
+}
+
+async function start() {
+  fuels = await loadFuels();
+  console.log(fuels);
+  init();
+}
 
 function init() {
   renderFuelOptions();
@@ -18,7 +32,7 @@ function init() {
   renderCost();
 }
 
-// Fill cards from data.js
+// Fill cards from database
 function renderFuelOptions() {
   for (const fuel of fuels) {
     const label = document.createElement("label");
@@ -28,7 +42,7 @@ function renderFuelOptions() {
     input.type = "radio";
     input.name = "fuel";
     input.value = fuel.id;
-    if (fuel.default) {
+    if (fuel === fuels[0]) {
       input.checked = true;
     }
 
