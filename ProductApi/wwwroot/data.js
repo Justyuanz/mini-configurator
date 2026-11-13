@@ -11,14 +11,11 @@ const cylinderOptions = [
   { id: "9", name: "9 cylinders", count: 9, priceExtra: 140000 },
 ];
 
-const addons = [
-  { id: "hybrid", name: "Battery hybrid", price: 250000 },
-  {
-    id: "scrubber",
-    name: "Exhaust scrubber",
-    price: 180000,
-    onlyFuel: "diesel",
-    default: true,
-  },
-  { id: "monitoring", name: "Remote monitoring", price: 40000 },
-];
+let fuels = [];
+let addons = [];
+
+async function loadFuels() {
+  const res = await fetch("/api/fuels");
+  const data = await res.json();
+  return data;
+}
