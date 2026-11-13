@@ -45,4 +45,35 @@ app.MapGet("/api/fuels", async () =>
     return fuels;
 });
 
+app.MapGet("/api/addons", async () =>
+{
+    await using var connection = new MySqlConnection(connString);
+    await connection.OpenAsync();
+
+    using var command = new MySqlCommand();
+    command.Connection = connection;
+        command.CommandText = """
+    SELECT id, name, price
+    FROM products
+    WHERE kind = 'addon'
+    ORDER BY price
+    """;
+
+    await using var reader = await command.ExecuteReaderAsync();
+
+    var addons = new List<object>();
+
+    while (await reader.ReadAsync())
+    {
+        addons.Add(new
+        {
+            id = reader.GetString(reader.GetOrdinal("id")),
+            name = reader.GetString(reader.GetOrdinal("name")),
+            price = reader.GetDecimal(reader.GetOrdinal("price")),
+        });
+    }
+
+    return addons;
+});
+
 app.Run();
