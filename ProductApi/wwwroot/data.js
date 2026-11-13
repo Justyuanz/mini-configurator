@@ -19,3 +19,9 @@ async function loadFuels() {
   const data = await res.json();
   return data;
 }
+
+async function loadAddons() {
+  const res = await fetch("/api/addons");
+  const data = await res.json();
+  return data;
+}

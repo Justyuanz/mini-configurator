@@ -69,9 +69,6 @@ function renderAddonOptions() {
     input.type = "checkbox";
     input.name = "addon";
     input.value = addon.id;
-    if (addon === addons[0]) {
-      input.checked = true;
-    }
 
     const labelText = `${addon.name} · €${addon.price.toLocaleString("en-US")}`;
     label.append(input);
