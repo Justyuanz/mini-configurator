@@ -90,6 +90,57 @@ app.MapGet("/api/addons", async (string? fuel) =>
     return addons;
 });
 
+app.MapPost("/api/quote", async (QuoteRequest req) =>
+{
+    if (req.Engines < 1 || req.Engines > 4)
+        return Results.BadRequest(new { error = "engines must be 1-4" });
 
+    await using var connection = new MySqlConnection(connString);
+    await connection.OpenAsync();
 
+    using var command = new MySqlCommand();
+    command.Connection = connection;
+    command.CommandText = """
+    SELECT price FROM products
+    WHERE kind = 'fuel' AND id = @fuelId
+    """;
+    command.Parameters.AddWithValue("@fuelId", req.FuelId);
+
+    var result = await command.ExecuteScalarAsync();
+    if (result == null)
+        return Results.BadRequest(new { error = "unknown fuel" });
+    decimal fuelPrice = (decimal)result;
+
+    // Look up which addons this fuel allows, and their prices.
+    command.CommandText = """
+    SELECT p.id, p.price
+    FROM products p
+    INNER JOIN addon_fuels af ON af.addon_id = p.id
+    WHERE af.fuel_id = @fuelId
+    """;
+
+    var allowedAddons = new Dictionary<string, decimal>();
+
+    await using var reader = await command.ExecuteReaderAsync();
+    while (await reader.ReadAsync())
+    {
+        string addonId = reader.GetString(reader.GetOrdinal("id"));
+        decimal addonPrice = reader.GetDecimal(reader.GetOrdinal("price"));
+        allowedAddons.Add(addonId, addonPrice);
+    }
+    decimal total = fuelPrice * req.Engines;
+
+    string[] addonIds = req.Addons ?? [];
+    foreach (string addonId in addonIds)
+    {
+        if (!allowedAddons.TryGetValue(addonId, out decimal addonPrice))
+            return Results.BadRequest(new { error = $"addon not allowed: {addonId}" });
+        total += addonPrice;
+    }
+
+    return Results.Ok(new { total });
+});
 app.Run();
+
+// The shape of the JSON that POSTs to /api/quote.
+record QuoteRequest(string FuelId, int Engines, string[]? Addons);
