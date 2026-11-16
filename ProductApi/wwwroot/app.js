@@ -13,6 +13,8 @@ start();
 async function start() {
   fuels = await loadFuels();
   addons = await loadAddons();
+  vessels = await loadVessels();
+  cylinderOptions = await loadCylinders();
 
   await init();
 }
@@ -99,7 +101,7 @@ function renderCost() {
 
   let hasError = false;
 
-  disableIncompatibleAddons(form.elements.fuel.value); //automatically gives the checked one
+  disableIncompatibleAddons(); //automatically gives the checked one
   const { vessel, fuel, enginesRaw, cylinders, selectedAddons } = readState();
 
   const engineCheck = validateEngines(enginesRaw, vessel);
