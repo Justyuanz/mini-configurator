@@ -45,19 +45,33 @@ app.MapGet("/api/fuels", async () =>
     return fuels;
 });
 
-app.MapGet("/api/addons", async () =>
+app.MapGet("/api/addons", async (string? fuel) =>
 {
     await using var connection = new MySqlConnection(connString);
     await connection.OpenAsync();
 
     using var command = new MySqlCommand();
     command.Connection = connection;
+    if (fuel == null)
+    {
         command.CommandText = """
-    SELECT id, name, price
-    FROM products
-    WHERE kind = 'addon'
-    ORDER BY price
-    """;
+        SELECT id, name, price
+        FROM products
+        WHERE kind = 'addon'
+        ORDER BY price
+        """;
+    }
+    else
+    {
+        command.CommandText = """
+        SELECT p.id, p.name, p.price
+        FROM products p
+        INNER JOIN addon_fuels af ON af.addon_id = p.id
+        WHERE af.fuel_id = @fuelId
+        """;
+        command.Parameters.AddWithValue("@fuelId", fuel);
+    }
+
 
     await using var reader = await command.ExecuteReaderAsync();
 
@@ -75,5 +89,7 @@ app.MapGet("/api/addons", async () =>
 
     return addons;
 });
+
+
 
 app.Run();
