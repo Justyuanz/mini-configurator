@@ -45,6 +45,68 @@ app.MapGet("/api/fuels", async () =>
     return fuels;
 });
 
+app.MapGet("/api/vessels", async () =>
+{
+    await using var connection = new MySqlConnection(connString);
+    await connection.OpenAsync();
+
+    using var command = new MySqlCommand();
+    command.Connection = connection;
+    command.CommandText = """
+    SELECT id, name, min_engines
+    FROM vessels
+    ORDER BY name
+    """;
+
+    await using var reader = await command.ExecuteReaderAsync();
+
+    var vessels = new List<object>();
+
+    while (await reader.ReadAsync())
+    {
+        vessels.Add(new
+        {
+            id         = reader.GetString(reader.GetOrdinal("id")),
+            name       = reader.GetString(reader.GetOrdinal("name")),
+            minEngines = reader.GetInt32(reader.GetOrdinal("min_engines")),
+        });
+    }
+
+    return vessels;
+});
+
+app.MapGet("/api/cylinders", async () =>
+{
+    await using var connection = new MySqlConnection(connString);
+    await connection.OpenAsync();
+
+    using var command = new MySqlCommand();
+    command.Connection = connection;
+    command.CommandText = """
+    SELECT id, name, count, price_extra, is_default
+    FROM cylinder_options
+    ORDER BY count
+    """;
+
+    await using var reader = await command.ExecuteReaderAsync();
+
+    var cylinders = new List<object>();
+
+    while (await reader.ReadAsync())
+    {
+        cylinders.Add(new
+        {
+            id         = reader.GetString(reader.GetOrdinal("id")),
+            name       = reader.GetString(reader.GetOrdinal("name")),
+            count      = reader.GetInt32(reader.GetOrdinal("count")),
+            priceExtra = reader.GetDecimal(reader.GetOrdinal("price_extra")),
+            @default   = reader.GetBoolean(reader.GetOrdinal("is_default")),
+        });
+    }
+
+    return cylinders;
+});
+
 app.MapGet("/api/addons", async (string? fuel) =>
 {
     await using var connection = new MySqlConnection(connString);
@@ -71,7 +133,6 @@ app.MapGet("/api/addons", async (string? fuel) =>
         """;
         command.Parameters.AddWithValue("@fuelId", fuel);
     }
-
 
     await using var reader = await command.ExecuteReaderAsync();
 
