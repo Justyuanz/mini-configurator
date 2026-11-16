@@ -35,7 +35,7 @@ function validateAddons(selectedAddons, fuelId) {
   return { ok: true };
 }
 
-function saveToUrl(vessel, fuel, enginesRaw, cylinders, selectedAddons) {
+function saveFormToUrl(vessel, fuel, enginesRaw, cylinders, selectedAddons) {
   const params = new URLSearchParams();
 
   params.set("vessel", vessel.id);
@@ -49,7 +49,7 @@ function saveToUrl(vessel, fuel, enginesRaw, cylinders, selectedAddons) {
   history.replaceState(null, "", "?" + params);
 }
 
-function loadFromUrl() {
+function applyUrlToForm() {
   const paramsFromUrl = new URLSearchParams(location.search);
   const vesselID = paramsFromUrl.get("vessel");
   const fuelID = paramsFromUrl.get("fuel");
@@ -86,15 +86,11 @@ function findById(list, id) {
   return list.find((item) => item.id === id);
 }
 
-function syncAddonCheckbox(fuelId) {
+function disableIncompatibleAddons() {
   const addonCheckboxes = form.querySelectorAll('input[name="addon"]');
 
   addonCheckboxes.forEach((el) => {
-    let allowed = false;
-    const addon = findById(addons, el.value);
-    if (!addon.onlyFuel || addon.onlyFuel === fuelId) {
-      allowed = true;
-    }
+    const allowed = allowedAddons.includes(el.value);
     if (!allowed) {
       el.disabled = true;
       el.checked = false;

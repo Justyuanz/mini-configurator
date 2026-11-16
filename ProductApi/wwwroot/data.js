@@ -11,8 +11,10 @@ const cylinderOptions = [
   { id: "9", name: "9 cylinders", count: 9, priceExtra: 140000 },
 ];
 
+// global
 let fuels = [];
 let addons = [];
+let allowedAddons = [];
 
 async function loadFuels() {
   const res = await fetch("/api/fuels");
@@ -24,4 +26,15 @@ async function loadAddons() {
   const res = await fetch("/api/addons");
   const data = await res.json();
   return data;
+}
+
+async function loadAllowedAddons(fuelId) {
+  const res = await fetch(`/api/addons?fuel=${fuelId}`);
+  const data = await res.json();
+  const allowedAddonIds = [];
+
+  data.forEach((addon) => {
+    allowedAddonIds.push(addon.id);
+  });
+  return allowedAddonIds;
 }

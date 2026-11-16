@@ -14,15 +14,17 @@ async function start() {
   fuels = await loadFuels();
   addons = await loadAddons();
 
-  console.log(fuels);
-  init();
+  await init();
 }
 
-function init() {
+async function init() {
   renderFuelOptions();
   renderCylinderOptions();
   renderAddonOptions();
-  loadFromUrl();
+
+  applyUrlToForm();
+  allowedAddons = await loadAllowedAddons(form.elements.fuel.value);
+
   renderCost();
 }
 
@@ -83,7 +85,10 @@ form.addEventListener("submit", (e) => {
   renderCost();
 });
 
-form.addEventListener("change", (e) => {
+form.addEventListener("change", async (e) => {
+  if (e.target.name === "fuel") {
+    allowedAddons = await loadAllowedAddons(e.target.value);
+  }
   renderCost();
 });
 
@@ -94,7 +99,7 @@ function renderCost() {
 
   let hasError = false;
 
-  syncAddonCheckbox(form.elements.fuel.value); //automatically gives the checked one
+  disableIncompatibleAddons(form.elements.fuel.value); //automatically gives the checked one
   const { vessel, fuel, enginesRaw, cylinders, selectedAddons } = readState();
 
   const engineCheck = validateEngines(enginesRaw, vessel);
@@ -110,7 +115,7 @@ function renderCost() {
     hasError = true;
   }
 
-  saveToUrl(vessel, fuel, enginesRaw, cylinders, selectedAddons);
+  saveFormToUrl(vessel, fuel, enginesRaw, cylinders, selectedAddons);
   if (hasError) return;
 
   const totalPrice = calculatePrice(
