@@ -161,6 +161,7 @@ app.MapPost("/api/quote", async (QuoteRequest req) =>
 
     using var command = new MySqlCommand();
     command.Connection = connection;
+    // Price
     command.CommandText = """
     SELECT price FROM products
     WHERE kind = 'fuel' AND id = @fuelId
@@ -172,7 +173,29 @@ app.MapPost("/api/quote", async (QuoteRequest req) =>
         return Results.BadRequest(new { error = "unknown fuel" });
     decimal fuelPrice = (decimal)result;
 
-    // Look up which addons this fuel allows, and their prices.
+    // Vessel
+    command.CommandText = "SELECT min_engines FROM vessels WHERE id = @vesselId";
+    command.Parameters.AddWithValue("@vesselId", req.VesselId);
+
+    var minResult = await command.ExecuteScalarAsync();
+    if (minResult == null)
+        return Results.BadRequest(new { error = "unknown vessel" });
+
+    int minEngines = (int)minResult;
+    if (req.Engines < minEngines)
+        return Results.BadRequest(new { error = $"this vessel needs at least {minEngines} engines" });
+
+    // Cylinders
+    command.CommandText = "SELECT price_extra FROM cylinder_options WHERE id = @cylinderId";
+    command.Parameters.AddWithValue("@cylinderId", req.CylinderId);
+
+    var cylResult = await command.ExecuteScalarAsync();
+    if (cylResult == null)
+        return Results.BadRequest(new { error = "unknown cylinders" });
+
+    decimal cylinderPrice = (decimal)cylResult;
+
+    // Addon
     command.CommandText = """
     SELECT p.id, p.price
     FROM products p
@@ -181,7 +204,6 @@ app.MapPost("/api/quote", async (QuoteRequest req) =>
     """;
 
     var allowedAddons = new Dictionary<string, decimal>();
-
     await using var reader = await command.ExecuteReaderAsync();
     while (await reader.ReadAsync())
     {
@@ -189,7 +211,7 @@ app.MapPost("/api/quote", async (QuoteRequest req) =>
         decimal addonPrice = reader.GetDecimal(reader.GetOrdinal("price"));
         allowedAddons.Add(addonId, addonPrice);
     }
-    decimal total = fuelPrice * req.Engines;
+    decimal total = (fuelPrice + cylinderPrice) * req.Engines;
 
     string[] addonIds = req.Addons ?? [];
     foreach (string addonId in addonIds)
@@ -201,7 +223,8 @@ app.MapPost("/api/quote", async (QuoteRequest req) =>
 
     return Results.Ok(new { total });
 });
+
 app.Run();
 
 // The shape of the JSON that POSTs to /api/quote.
-record QuoteRequest(string FuelId, int Engines, string[]? Addons);
+record QuoteRequest(string VesselId, string FuelId, int Engines, string CylinderId, string[]? Addons);
