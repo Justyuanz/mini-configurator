@@ -111,12 +111,6 @@ function renderCost() {
     hasError = true;
   }
 
-  const fuelId = form.elements.fuel.value;
-  const addonCheck = validateAddons(selectedAddons, fuelId);
-  if (!addonCheck.ok) {
-    hasError = true;
-  }
-
   saveFormToUrl(vessel, fuel, enginesRaw, cylinders, selectedAddons);
   if (hasError) return;
 

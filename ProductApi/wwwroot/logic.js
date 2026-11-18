@@ -24,17 +24,6 @@ function validateEngines(raw, vessel) {
   return { ok: true, count };
 }
 
-function validateAddons(selectedAddons, fuelId) {
-  for (const addon of selectedAddons) {
-    if (addon.onlyFuel && addon.onlyFuel !== fuelId) {
-      return {
-        ok: false,
-      };
-    }
-  }
-  return { ok: true };
-}
-
 function saveFormToUrl(vessel, fuel, enginesRaw, cylinders, selectedAddons) {
   const params = new URLSearchParams();
 
