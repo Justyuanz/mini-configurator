@@ -39,3 +39,13 @@ async function loadAllowedAddons(fuelId) {
   });
   return allowedAddonIds;
 }
+
+async function sendQuote(quote) {
+  const res = await fetch("/api/quote", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(quote),
+  });
+  const data = await res.json();
+  return { ok: res.ok };
+}

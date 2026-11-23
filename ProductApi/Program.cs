@@ -96,11 +96,11 @@ app.MapGet("/api/cylinders", async () =>
     {
         cylinders.Add(new
         {
-            id         = reader.GetString(reader.GetOrdinal("id")),
-            name       = reader.GetString(reader.GetOrdinal("name")),
-            count      = reader.GetInt32(reader.GetOrdinal("count")),
+            id = reader.GetString(reader.GetOrdinal("id")),
+            name = reader.GetString(reader.GetOrdinal("name")),
+            count = reader.GetInt32(reader.GetOrdinal("count")),
             priceExtra = reader.GetDecimal(reader.GetOrdinal("price_extra")),
-            @default   = reader.GetBoolean(reader.GetOrdinal("is_default")),
+            @default = reader.GetBoolean(reader.GetOrdinal("is_default")),
         });
     }
 

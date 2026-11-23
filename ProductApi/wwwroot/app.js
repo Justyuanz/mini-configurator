@@ -82,9 +82,15 @@ function renderAddonOptions() {
 }
 
 // Eventlistener
-form.addEventListener("submit", (e) => {
+form.addEventListener("submit", async (e) => {
   e.preventDefault();
-  renderCost();
+  const result = await sendQuote(buildQuote());
+
+  if (result.ok) {
+    alert("Quote sent");
+  } else {
+    alert("Error");
+  }
 });
 
 form.addEventListener("change", async (e) => {
@@ -175,6 +181,23 @@ function renderSummary({
     li.append(label, value);
     summaryList.append(li);
   }
+}
+
+function buildQuote() {
+  const { vessel, fuel, enginesRaw, cylinders, selectedAddons } = readState();
+
+  const addonIds = [];
+  selectedAddons.forEach((addon) => {
+    addonIds.push(addon.id);
+  });
+
+  return {
+    vesselId: vessel.id,
+    fuelId: fuel.id,
+    engines: Number(enginesRaw),
+    cylinderId: cylinders.id,
+    addons: addonIds,
+  };
 }
 
 // Read state
