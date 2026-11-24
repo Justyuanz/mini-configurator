@@ -87,7 +87,7 @@ form.addEventListener("submit", async (e) => {
   const result = await sendQuote(buildQuote());
 
   if (result.ok) {
-    alert("Quote sent");
+    alert("Quote saved. Total cost: " + result.data.total);
   } else {
     alert("Error");
   }

@@ -221,7 +221,18 @@ app.MapPost("/api/quote", async (QuoteRequest req) =>
         total += addonPrice;
     }
 
-    return Results.Ok(new { total });
+    await reader.CloseAsync(); // Close the add-on reader first, one connection can only run one command at a time while a reader is open.
+
+    command.CommandText = """
+    INSERT INTO quotes (vessel_id, fuel_id, engines, cylinder_id, total_cost)
+    VALUES (@vesselId, @fuelId, @engines, @cylinderId, @total)
+    """;
+    command.Parameters.AddWithValue("@engines", req.Engines);
+    command.Parameters.AddWithValue("@total", total);
+    await command.ExecuteNonQueryAsync();
+    long quoteId = command.LastInsertedId;
+
+    return Results.Ok(new{total});
 });
 
 app.Run();

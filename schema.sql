@@ -27,16 +27,24 @@ CREATE TABLE cylinder_options (
 
 -- Which add-on works with which fuel (many-to-many).
 CREATE TABLE addon_fuels (
-  addon_id VARCHAR(20) NOT NULL,
-  fuel_id  VARCHAR(20) NOT NULL,
+  addon_id    VARCHAR(20) NOT NULL,
+  fuel_id     VARCHAR(20) NOT NULL,
   PRIMARY KEY (addon_id, fuel_id),
   FOREIGN KEY (addon_id) REFERENCES products(id),
   FOREIGN KEY (fuel_id)  REFERENCES products(id)
 );
 
 CREATE TABLE quotes (
-  id       INT          AUTO_INCREMENT PRIMARY KEY,
-  customer VARCHAR(100) NOT NULL
+  id          INT AUTO_INCREMENT PRIMARY KEY,
+  vessel_id   VARCHAR(20)   NOT NULL,
+  fuel_id     VARCHAR(20)   NOT NULL,
+  engines     INT           NOT NULL,
+  cylinder_id VARCHAR(20)   NOT NULL,
+  total_cost  DECIMAL(12,2) NOT NULL,
+  created_at  DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (vessel_id)   REFERENCES vessels(id),
+  FOREIGN KEY (fuel_id)     REFERENCES products(id),
+  FOREIGN KEY (cylinder_id) REFERENCES cylinder_options(id)
 );
 
 CREATE TABLE quote_items (

@@ -47,5 +47,5 @@ async function sendQuote(quote) {
     body: JSON.stringify(quote),
   });
   const data = await res.json();
-  return { ok: res.ok };
+  return { ok: res.ok, data: data };
 }
